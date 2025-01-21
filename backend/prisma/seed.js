@@ -16,24 +16,24 @@ async function main() {
     data: {
       email: 'alice@example.com',
       password: 'hashedpassword1', // For MVP, not actually hashed
-      role: 'user'
-    }
+      role: 'user',
+    },
   });
 
   const user2 = await prisma.user.create({
     data: {
       email: 'bob@example.com',
       password: 'hashedpassword2',
-      role: 'user'
-    }
+      role: 'user',
+    },
   });
 
   // Create Pets
   const petsData = Array.from({ length: 5 }).map(() => ({
-    name: faker.name.firstName(),
+    name: faker.person.firstName(),
     species: faker.helpers.arrayElement(['Dog', 'Cat', 'Bird']),
     breed: faker.animal.dog(), // Just using dog for variety, ignoring species mismatch for demo
-    age: faker.datatype.number({ min: 1, max: 15 })
+    age: faker.number.int({ min: 1, max: 15 }),
   }));
 
   const pets = [];
@@ -48,9 +48,9 @@ async function main() {
       data: {
         userId: i % 2 === 0 ? user1.id : user2.id,
         petId: pets[i % pets.length].id,
-        rating: faker.datatype.number({ min: 1, max: 5 }),
-        text: faker.lorem.sentence()
-      }
+        rating: faker.number.int({ min: 1, max: 5 }),
+        text: faker.lorem.sentence(),
+      },
     });
   }
 
@@ -62,8 +62,8 @@ async function main() {
         data: {
           userId: Math.random() > 0.5 ? user1.id : user2.id,
           reviewId: review.id,
-          text: faker.lorem.sentence()
-        }
+          text: faker.lorem.sentence(),
+        },
       });
     }
   }

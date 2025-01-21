@@ -1,12 +1,21 @@
 import React from 'react';
-import PetList from './components/PetList';
+import { Routes, Route } from 'react-router-dom';
+import LayoutBase from './components/LayoutBase';
+import PetListPage from './components/PetListPage';
+import PetDetailPage from './components/PetDetailPage';
+import LoginForm from './components/LoginForm';
+import RegisterForm from './components/RegisterForm';
 
 function App() {
   return (
-    <div style={{ padding: '1rem' }}>
-      <h1>Pet Review MVP</h1>
-      <PetList />
-    </div>
+    <Routes>
+      <Route element={<LayoutBase />}>
+        <Route path="/" element={<PetListPage />} />
+        <Route path="/pets/:id" element={<PetDetailPage />} />
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/register" element={<RegisterForm />} />
+      </Route>
+    </Routes>
   );
 }
 

@@ -2,7 +2,6 @@
   "name": "frontend",
   "version": "1.0.0",
   "description": "pet-review-app",
-  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "vite",
@@ -16,7 +15,10 @@
     "vite": "^6.0.7"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.5.2",
+    "antd": "^5.23.2",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.1.3"
   }
 }
