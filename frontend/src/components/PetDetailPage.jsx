@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Card, List, Form, Input, Button, Rate, Spin } from 'antd';
+import { Card, List, Form, Input, Button, Rate, Spin, message } from 'antd';
 import { getPetById, getReviewsForPet, createReview } from '../utils/api';
 import ReviewComments from './ReviewComments';
+import { useUser } from '../contexts/UserContext';
 
 function PetDetailPage() {
   const { id } = useParams();
+  const { user } = useUser(); // Get logged-in user
   const [pet, setPet] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [loadingPet, setLoadingPet] = useState(false);
@@ -17,7 +19,7 @@ function PetDetailPage() {
       const data = await getPetById(id);
       setPet(data);
     } catch (err) {
-      //
+      message.error('Failed to fetch pet details');
     } finally {
       setLoadingPet(false);
     }
@@ -29,28 +31,31 @@ function PetDetailPage() {
       const data = await getReviewsForPet(id);
       setReviews(data);
     } catch (err) {
-      //
+      message.error('Failed to fetch reviews');
     } finally {
       setLoadingReviews(false);
     }
   };
 
   const handleReviewSubmit = async (values) => {
-    // For demonstration, let's just set userId = 1
-    const userId = 1;
+    if (!user) {
+      message.error('You need to log in to submit a review');
+      return;
+    }
+
     const { rating, text } = values;
     try {
-      await createReview({ userId, petId: Number(id), rating, text });
-      fetchReviews();
+      await createReview({ userId: user.id, petId: Number(id), rating, text });
+      message.success('Review submitted successfully!');
+      fetchReviews(); // Refresh reviews
     } catch (err) {
-      // handle error
+      message.error('Failed to submit review');
     }
   };
 
   useEffect(() => {
     fetchPet();
     fetchReviews();
-    // eslint-disable-next-line
   }, [id]);
 
   if (loadingPet) return <Spin />;
@@ -99,8 +104,8 @@ function PetDetailPage() {
         >
           <Input.TextArea rows={4} />
         </Form.Item>
-        <Button type="primary" htmlType="submit">
-          Submit Review
+        <Button type="primary" htmlType="submit" disabled={!user}>
+          {user ? 'Submit Review' : 'Log in to Submit'}
         </Button>
       </Form>
     </div>

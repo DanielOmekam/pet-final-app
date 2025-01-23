@@ -4,13 +4,15 @@ import {
   getCommentsForReview,
   createComment,
   updateComment,
-  deleteComment
+  deleteComment,
 } from '../utils/api';
+import { useUser } from '../contexts/UserContext';
 
 function ReviewComments({ review, onCommentsChange }) {
   const [comments, setComments] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingComment, setEditingComment] = useState(null);
+  const { user } = useUser(); // Get logged-in user
 
   const fetchComments = async () => {
     try {
@@ -23,48 +25,28 @@ function ReviewComments({ review, onCommentsChange }) {
 
   useEffect(() => {
     fetchComments();
-    // eslint-disable-next-line
   }, []);
 
   const handleCreate = async (values) => {
-    const userId = 1; // Hard-coded for demonstration
+    if (!user) {
+      message.error('You need to log in to add a comment');
+      return;
+    }
+
     try {
-      await createComment({ userId, reviewId: review.id, text: values.text });
-      message.success('Comment created');
+      await createComment({ userId: user.id, reviewId: review.id, text: values.text });
+      message.success('Comment added successfully!');
       fetchComments();
-      onCommentsChange(); // Refresh parent if needed
+      onCommentsChange();
       setShowForm(false);
     } catch (err) {
-      message.error('Failed to create comment');
-    }
-  };
-
-  const handleUpdate = async (commentId, newText) => {
-    try {
-      await updateComment(commentId, newText);
-      message.success('Comment updated');
-      fetchComments();
-      onCommentsChange();
-      setEditingComment(null);
-    } catch (err) {
-      message.error('Failed to update comment');
-    }
-  };
-
-  const handleDelete = async (commentId) => {
-    try {
-      await deleteComment(commentId);
-      message.success('Comment deleted');
-      fetchComments();
-      onCommentsChange();
-    } catch (err) {
-      message.error('Failed to delete comment');
+      message.error('Failed to add comment');
     }
   };
 
   return (
     <div style={{ marginTop: '1rem', width: '100%' }}>
-      <Button onClick={() => setShowForm(!showForm)}>
+      <Button onClick={() => setShowForm(!showForm)} disabled={!user}>
         {showForm ? 'Cancel Comment' : 'Add Comment'}
       </Button>
 
@@ -86,65 +68,15 @@ function ReviewComments({ review, onCommentsChange }) {
         dataSource={comments}
         renderItem={(comment) => (
           <List.Item style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
-            {editingComment?.id === comment.id ? (
-              <EditCommentForm
-                comment={comment}
-                onUpdate={handleUpdate}
-                onCancel={() => setEditingComment(null)}
-              />
-            ) : (
-              <>
-                <div>
-                  <strong>{comment.user?.email || 'User'}:</strong> {comment.text}
-                </div>
-                <div style={{ marginTop: '0.5rem' }}>
-                  <Button
-                    type="link"
-                    onClick={() => setEditingComment(comment)}
-                    style={{ marginRight: '0.5rem' }}
-                  >
-                    Edit
-                  </Button>
-                  <Button type="link" danger onClick={() => handleDelete(comment.id)}>
-                    Delete
-                  </Button>
-                </div>
-              </>
-            )}
+            <>
+              <div>
+                <strong>{comment.user?.email || 'User'}:</strong> {comment.text}
+              </div>
+            </>
           </List.Item>
         )}
       />
     </div>
-  );
-}
-
-function EditCommentForm({ comment, onUpdate, onCancel }) {
-  const [form] = Form.useForm();
-
-  const handleFinish = (values) => {
-    onUpdate(comment.id, values.text);
-  };
-
-  useEffect(() => {
-    form.setFieldsValue({ text: comment.text });
-    // eslint-disable-next-line
-  }, [comment]);
-
-  return (
-    <Form form={form} layout="inline" onFinish={handleFinish}>
-      <Form.Item
-        name="text"
-        rules={[{ required: true, message: 'Comment text required' }]}
-      >
-        <Input placeholder="Edit comment..." />
-      </Form.Item>
-      <Button type="primary" htmlType="submit">
-        Update
-      </Button>
-      <Button style={{ marginLeft: '0.5rem' }} onClick={onCancel}>
-        Cancel
-      </Button>
-    </Form>
   );
 }
 
