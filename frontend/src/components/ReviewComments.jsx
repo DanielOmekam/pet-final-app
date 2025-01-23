@@ -6,7 +6,7 @@ import {
   updateComment,
   deleteComment,
 } from '../utils/api';
-import { useUser } from '../contexts/UserContext';
+import { useUser } from '/contexts/UserContext';
 
 function ReviewComments({ review, onCommentsChange }) {
   const [comments, setComments] = useState([]);

@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Card, List, Form, Input, Button, Rate, Spin, message } from 'antd';
 import { getPetById, getReviewsForPet, createReview } from '../utils/api';
 import ReviewComments from './ReviewComments';
-import { useUser } from '../contexts/UserContext';
+import { useUser } from '/contexts/UserContext';
 
 function PetDetailPage() {
   const { id } = useParams();

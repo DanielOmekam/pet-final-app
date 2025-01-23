@@ -2,7 +2,7 @@ import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import { Layout, Menu, message } from 'antd';
 import { HomeOutlined, UserOutlined } from '@ant-design/icons';
-import { useUser } from '../contexts/UserContext';
+import { useUser } from '/contexts/UserContext';
 
 const { Header, Content, Footer } = Layout;
 
